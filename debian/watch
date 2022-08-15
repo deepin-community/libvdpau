@@ -1,0 +1,4 @@
+version=4
+
+opts=uversionmangle=s/\.(tar.*|tgz|zip|gz|bz2)$//i,dversionmangle=s/[-.+~]?(cvs|svn|git|snapshot|pre|hg)(.*)$//i,pgpsigurlmangle=s/$/.sig/ \
+https://gitlab.freedesktop.org/vdpau/libvdpau/-/tags .*/libvdpau-([\d+\.]+|\d+)\.tar\.bz2

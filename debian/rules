@@ -1,0 +1,59 @@
+#!/usr/bin/make -f
+
+#export DH_VERBOSE=1
+
+driver_depends_Debian	+= libvdpau-va-gl1 [linux-any],
+driver_depends		+= mesa-vdpau-drivers [linux-any kfreebsd-any],
+
+driver_suggests_Debian	+= nvidia-vdpau-driver [amd64 i386 arm64],
+driver_suggests_Debian	+= nvidia-tesla-440-vdpau-driver [amd64 i386 ppc64el],
+driver_suggests_Debian	+= nvidia-tesla-418-vdpau-driver [amd64 i386 ppc64el],
+driver_suggests_Debian	+= nvidia-legacy-390xx-vdpau-driver [amd64 i386 armhf],
+driver_suggests_Debian	+= nvidia-legacy-340xx-vdpau-driver [amd64 i386 armhf],
+driver_suggests_Ubuntu	+= libvdpau-va-gl1 [linux-any],
+driver_suggests		+= vdpau-driver,
+
+VENDOR	:= $(shell dpkg-vendor --derives-from Ubuntu && echo Ubuntu || echo Debian)
+
+# see FEATURE AREAS in dpkg-buildflags(1)
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+# Disable if dependencies are not available, like on buildd
+# arch-dependent builds, as they are Build-Depends-Indep
+define DOCS_CONF
+       $(shell if test -x /usr/bin/doxygen && test -x /usr/bin/dot; \
+               then echo -Ddocumentation=true; else echo -Ddocumentation=false; fi )
+endef
+
+ifneq (,$(findstring nodoc,$(DEB_BUILD_OPTIONS)))
+DOCS_CONF=-Ddocumentation=false
+endif
+ifneq (,$(findstring nodoc,$(DEB_BUILD_PROFILES)))
+DOCS_CONF=-Ddocumentation=false
+endif
+
+CONFIGURE_OPTIONS ?= $(DOCS_CONF) \
+		     -Ddri2=true
+
+%:
+	dh $@
+
+binary: binary-indep binary-arch ;
+
+override_dh_auto_configure:
+	dh_auto_configure -- $(CONFIGURE_OPTIONS)
+
+override_dh_installdocs:
+	dh_installdocs -X.md5 -X/_formulas. -X/_form0.
+
+override_dh_bugfiles:
+	dh_bugfiles -A
+
+# ignore the plugin
+override_dh_makeshlibs:
+	dh_makeshlibs -Xvdpau/libvdpau_trace.so.1
+
+override_dh_gencontrol:
+	dh_gencontrol -- \
+		-V'driver:Depends=$(driver_depends_$(VENDOR)), $(driver_depends)' \
+		-V'driver:Suggests=$(driver_suggests_$(VENDOR)), $(driver_suggests)'

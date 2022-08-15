@@ -1,0 +1,24 @@
+image: archlinux/base:latest
+
+stages:
+ - build
+ - deploy
+
+build:
+  stage: build
+  script:
+      - pacman --noconfirm -Sy gcc meson ninja pkg-config doxygen graphviz texlive-bin xorgproto
+      - ./test/gitlab-ci.sh
+  artifacts:
+    paths:
+      - public
+
+pages:
+  stage: deploy
+  script:
+    - echo "Nothing to do"
+  artifacts:
+    paths:
+      - public
+  only:
+   - master

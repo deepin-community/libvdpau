@@ -1,0 +1,96 @@
+Source: libvdpau
+Section: libs
+Priority: optional
+Maintainer: Deepin Developer <deepin-dev@deepin.org>
+Uploaders: Deepin Packages Builder <packages@deepin.org>
+ Andreas Beckmann <anbe@debian.org>,
+ Luca Boccassi <bluca@debian.org>
+Build-Depends:
+ debhelper-compat (= 13),
+ meson (>= 0.41),
+ pkg-config,
+ libx11-dev,
+ x11proto-dri2-dev,
+ libxext-dev,
+Build-Depends-Indep:
+ doxygen-latex <!nodoc>,
+ graphviz <!nodoc>,
+ ghostscript <!nodoc>,
+Rules-Requires-Root: no
+Standards-Version: 4.5.1
+Homepage: https://gitlab.freedesktop.org/vdpau/libvdpau
+#Vcs-Browser
+#Vcs-Git
+
+Package: libvdpau-dev
+Multi-Arch: same
+Architecture: any
+Section: libdevel
+Depends:
+ libvdpau1 (= ${binary:Version}),
+ libx11-dev,
+ ${misc:Depends}
+Suggests: libvdpau-doc
+Description: Video Decode and Presentation API for Unix (development files)
+ VDPAU (Video Decode and Presentation API for Unix) is an open source
+ library (libvdpau) and API designed by NVIDIA originally for its GeForce
+ 8 series and later GPU hardware, targeted at the X Window System on Unix
+ operating-systems (including Linux, FreeBSD, and Solaris). This VDPAU API
+ allows video programs to offload portions of the video decoding process
+ and video post-processing to the GPU video-hardware.
+ .
+ This package contains the files necessary for development with VDPAU.
+
+Package: libvdpau1
+Architecture: any
+Multi-Arch: same
+Pre-Depends: ${misc:Pre-Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends:
+ vdpau-driver-all | vdpau-driver,
+Description: Video Decode and Presentation API for Unix (libraries)
+ VDPAU (Video Decode and Presentation API for Unix) is an open source
+ library (libvdpau) and API designed by NVIDIA originally for its GeForce
+ 8 series and later GPU hardware, targeted at the X Window System on Unix
+ operating-systems (including Linux, FreeBSD, and Solaris). This VDPAU API
+ allows video programs to offload portions of the video decoding process
+ and video post-processing to the GPU video-hardware.
+ .
+ This package contains the VDPAU wrapper and trace libraries.
+
+Package: libvdpau-doc
+Architecture: all
+Multi-Arch: foreign
+Section: doc
+Build-Profiles: <!nodoc>
+Depends: ${misc:Depends}
+Description: Video Decode and Presentation API for Unix (documentation)
+ VDPAU (Video Decode and Presentation API for Unix) is an open source
+ library (libvdpau) and API designed by NVIDIA originally for its GeForce
+ 8 series and later GPU hardware, targeted at the X Window System on Unix
+ operating-systems (including Linux, FreeBSD, and Solaris). This VDPAU API
+ allows video programs to offload portions of the video decoding process
+ and video post-processing to the GPU video-hardware.
+ .
+ This package contains the VDPAU documentation.
+
+Package: vdpau-driver-all
+Section: video
+Architecture: any
+Multi-Arch: same
+Depends:
+ ${driver:Depends},
+ ${misc:Depends}
+Suggests:
+ ${driver:Suggests},
+Description: Video Decode and Presentation API for Unix (driver metapackage)
+ VDPAU (Video Decode and Presentation API for Unix) is an open source
+ library (libvdpau) and API designed by NVIDIA originally for its GeForce
+ 8 series and later GPU hardware, targeted at the X Window System on Unix
+ operating-systems (including Linux, FreeBSD, and Solaris). This VDPAU API
+ allows video programs to offload portions of the video decoding process
+ and video post-processing to the GPU video-hardware.
+ .
+ This package depends on the full suite of drivers for the VDPAU API.
+ It does not provide any drivers itself, and may be removed if you wish to
+ only have certain drivers installed.
