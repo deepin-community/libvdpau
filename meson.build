@@ -51,7 +51,7 @@ subdir('trace')
 import('pkgconfig').generate(
     name : 'VDPAU',
     filebase : 'vdpau',
-    version : '1.4',
+    version : '1.5',
     description : 'The Video Decode and Presentation API for UNIX',
     libraries : '-L${libdir} -lvdpau',
     variables : 'moduledir=' + moduledir,
