@@ -2685,6 +2685,12 @@ typedef uint32_t VdpDecoderProfile;
 #define VDP_DECODER_PROFILE_HEVC_MAIN_444_10            ((VdpDecoderProfile)105)
 /** \hideinitializer */
 #define VDP_DECODER_PROFILE_HEVC_MAIN_444_12            ((VdpDecoderProfile)106)
+/** \hideinitializer */
+#define VDP_DECODER_PROFILE_AV1_MAIN                    ((VdpDecoderProfile)107)
+/** \hideinitializer */
+#define VDP_DECODER_PROFILE_AV1_HIGH                    ((VdpDecoderProfile)108)
+/** \hideinitializer */
+#define VDP_DECODER_PROFILE_AV1_PROFESSIONAL            ((VdpDecoderProfile)109)
 
 /** \hideinitializer */
 #define VDP_DECODER_LEVEL_MPEG1_NA 0
@@ -2781,6 +2787,55 @@ typedef uint32_t VdpDecoderProfile;
 
 /** \hideinitializer */
 #define VDP_DECODER_LEVEL_VP9_L1 1
+
+/** \hideinitializer */
+#define VDP_DECODER_LEVEL_AV1_2_0 0
+/** \hideinitializer */
+#define VDP_DECODER_LEVEL_AV1_2_1 1
+/** \hideinitializer */
+#define VDP_DECODER_LEVEL_AV1_2_2 2
+/** \hideinitializer */
+#define VDP_DECODER_LEVEL_AV1_2_3 3
+/** \hideinitializer */
+#define VDP_DECODER_LEVEL_AV1_3_0 4
+/** \hideinitializer */
+#define VDP_DECODER_LEVEL_AV1_3_1 5
+/** \hideinitializer */
+#define VDP_DECODER_LEVEL_AV1_3_2 6
+/** \hideinitializer */
+#define VDP_DECODER_LEVEL_AV1_3_3 7
+/** \hideinitializer */
+#define VDP_DECODER_LEVEL_AV1_4_0 8
+/** \hideinitializer */
+#define VDP_DECODER_LEVEL_AV1_4_1 9
+/** \hideinitializer */
+#define VDP_DECODER_LEVEL_AV1_4_2 10
+/** \hideinitializer */
+#define VDP_DECODER_LEVEL_AV1_4_3 11
+/** \hideinitializer */
+#define VDP_DECODER_LEVEL_AV1_5_0 12
+/** \hideinitializer */
+#define VDP_DECODER_LEVEL_AV1_5_1 13
+/** \hideinitializer */
+#define VDP_DECODER_LEVEL_AV1_5_2 14
+/** \hideinitializer */
+#define VDP_DECODER_LEVEL_AV1_5_3 15
+/** \hideinitializer */
+#define VDP_DECODER_LEVEL_AV1_6_0 16
+/** \hideinitializer */
+#define VDP_DECODER_LEVEL_AV1_6_1 17
+/** \hideinitializer */
+#define VDP_DECODER_LEVEL_AV1_6_2 18
+/** \hideinitializer */
+#define VDP_DECODER_LEVEL_AV1_6_3 19
+/** \hideinitializer */
+#define VDP_DECODER_LEVEL_AV1_7_0 20
+/** \hideinitializer */
+#define VDP_DECODER_LEVEL_AV1_7_1 21
+/** \hideinitializer */
+#define VDP_DECODER_LEVEL_AV1_7_2 22
+/** \hideinitializer */
+#define VDP_DECODER_LEVEL_AV1_7_3 23
 
 /**
  * The VDPAU H.265/HEVC decoder levels correspond to the values of
@@ -3651,6 +3706,174 @@ typedef struct {
     int8_t cr_qp_adjustment[6];
 
 } VdpPictureInfoHEVC444;
+
+
+/**
+ * \brief Picture parameter information for an AV1 picture.
+ *
+ * Note: References to bitstream fields below may refer to data literally parsed
+ * from the bitstream, or derived from the bitstream using a mechanism described
+ * in the specification.
+ */
+typedef struct
+{
+     unsigned int width;
+     unsigned int height;
+
+     unsigned int   frame_offset;                        // defined as order_hint in AV1 specification
+
+     // sequence header
+     unsigned int   profile;                         // 0 = profile0, 1 = profile1, 2 = profile2
+     unsigned int   use_128x128_superblock;          // superblock size 0:64x64, 1: 128x128
+     unsigned int   subsampling_x;                   // (subsampling_x, _y) 1,1 = 420, 1,0 = 422, 0,0 = 444
+     unsigned int   subsampling_y;
+     unsigned int   mono_chrome;                     // for monochrome content, mono_chrome = 1 and (subsampling_x, _y) should be 1,1
+     unsigned int   bit_depth_minus8;                // bit depth minus 8
+     unsigned int   enable_filter_intra;             // tool enable in seq level, 0 : disable 1: frame header control
+     unsigned int   enable_intra_edge_filter;        // intra edge filtering process, 0 : disable 1: enabled
+     unsigned int   enable_interintra_compound;      // interintra, 0 : not present 1: present
+     unsigned int   enable_masked_compound;          // 1: mode info for inter blocks may contain the syntax element compound_type.
+                                                         // 0: syntax element compound_type will not be present
+     unsigned int   enable_dual_filter;              // vertical and horiz filter selection, 1: enable and 0: disable
+     unsigned int   enable_order_hint;               // order hint, and related tools, 1: enable and 0: disable
+     unsigned int   order_hint_bits_minus1;          // is used to compute OrderHintBits
+     unsigned int   enable_jnt_comp;                 // joint compound modes, 1: enable and 0: disable
+     unsigned int   enable_superres;                 // superres in seq level, 0 : disable 1: frame level control
+     unsigned int   enable_cdef;                     // cdef filtering in seq level, 0 : disable 1: frame level control
+     unsigned int   enable_restoration;              // loop restoration filtering in seq level, 0 : disable 1: frame level control
+     unsigned int   enable_fgs;                      // defined as film_grain_params_present in AV1 specification
+
+     // frame header
+     unsigned int   frame_type;                     // 0:Key frame, 1:Inter frame, 2:intra only, 3:s-frame
+     unsigned int   show_frame;                     // show_frame = 1 implies that frame should be immediately output once decoded
+     unsigned int   disable_cdf_update;              // CDF update during symbol decoding, 1: disabled, 0: enabled
+     unsigned int   allow_screen_content_tools;      // 1: intra blocks may use palette encoding, 0: palette encoding is never used
+     unsigned int   force_integer_mv;                // 1: motion vectors will always be integers, 0: can contain fractional bits
+     unsigned int   coded_denom;                     // coded_denom of the superres scale as specified in AV1 specification
+     unsigned int   allow_intrabc;                   // 1: intra block copy may be used, 0: intra block copy is not allowed
+     unsigned int   allow_high_precision_mv;         // 1/8 precision mv enable
+     unsigned int   interp_filter;                   // interpolation filter. Refer to section 6.8.9 of the AV1 specification Version 1.0.0 with Errata 1
+     unsigned int   switchable_motion_mode ;          // defined as is_motion_mode_switchable in AV1 specification
+     unsigned int   use_ref_frame_mvs ;               // 1: current frame can use the previous frame mv information, 0: will not use.
+     unsigned int   disable_frame_end_update_cdf ;    // 1: indicates that the end of frame CDF update is disabled
+     unsigned int   delta_q_present ;                 // quantizer index delta values are present in the block level
+     unsigned int   delta_q_res;                     // left shift which should be applied to decoded quantizer index delta values
+     unsigned int   using_qmatrix ;                   // 1: quantizer matrix will be used to compute quantizers
+     unsigned int   coded_lossless ;                  // 1: all segments use lossless coding
+     unsigned int   use_superres ;                    // 1: superres enabled for frame
+     unsigned int   tx_mode;                         // 0: ONLY4x4,1:LARGEST,2:SELECT
+     unsigned int   reference_mode ;                  // 0: SINGLE, 1: SELECT
+     unsigned int   allow_warped_motion ;             // 1: allow_warped_motion may be present, 0: allow_warped_motion will not be present
+     unsigned int   reduced_tx_set ;                  // 1: frame is restricted to subset of the full set of transform types, 0: no such restriction
+     unsigned int   skip_mode ;                       // 1: most of the mode info is skipped, 0: mode info is not skipped
+
+     // tiling info
+     unsigned int   num_tile_cols;                   // number of tiles across the frame., max is 64
+     unsigned int   num_tile_rows;                   // number of tiles down the frame., max is 64
+     unsigned int   context_update_tile_id;          // specifies which tile to use for the CDF update
+     unsigned short tile_widths[64];                 // Width of each column in superblocks
+     unsigned short tile_heights[64];                // height of each row in superblocks
+     unsigned int   tile_info[256 * 2];              //AV1_MAX_TILES = 256
+
+     // CDEF - refer to section 6.10.14 of the AV1 specification Version 1.0.0 with Errata 1
+     unsigned char  cdef_damping_minus_3;            // controls the amount of damping in the deringing filter
+     unsigned char  cdef_bits;                       // the number of bits needed to specify which CDEF filter to apply
+     unsigned char  cdef_y_strength[8];                  // 0-3 bits: y_pri_strength, 4-7 bits y_sec_strength
+     unsigned char  cdef_uv_strength[8];                 // 0-3 bits: uv_pri_strength, 4-7 bits uv_sec_strength
+
+     // SkipModeFrames
+     unsigned char   SkipModeFrame0;                 // specifies the frames to use for compound prediction when skip_mode is equal to 1.
+     unsigned char   SkipModeFrame1;
+
+     // qp information - refer to section 6.8.11 of the AV1 specification Version 1.0.0 with Errata 1
+     unsigned char  base_qindex;                         // indicates the base frame qindex. Defined as base_q_idx in AV1 specification
+     char           qp_y_dc_delta_q;                     // indicates the Y DC quantizer relative to base_q_idx. Defined as DeltaQYDc in AV1 specification
+     char           qp_u_dc_delta_q;                     // indicates the U DC quantizer relative to base_q_idx. Defined as DeltaQUDc in AV1 specification
+     char           qp_v_dc_delta_q;                     // indicates the V DC quantizer relative to base_q_idx. Defined as DeltaQVDc in AV1 specification
+     char           qp_u_ac_delta_q;                     // indicates the U AC quantizer relative to base_q_idx. Defined as DeltaQUAc in AV1 specification
+     char           qp_v_ac_delta_q;                     // indicates the V AC quantizer relative to base_q_idx. Defined as DeltaQVAc in AV1 specification
+     unsigned char  qm_y;                                // specifies the level in the quantizer matrix that should be used for luma plane decoding
+     unsigned char  qm_u;                                // specifies the level in the quantizer matrix that should be used for chroma U plane decoding
+     unsigned char  qm_v;                                // specifies the level in the quantizer matrix that should be used for chroma V plane decoding
+
+     // segmentation - refer to section 6.8.13 of the AV1 specification Version 1.0.0 with Errata 1
+     unsigned char segmentation_enabled ;             // 1 indicates that this frame makes use of the segmentation tool
+     unsigned char segmentation_update_map ;          // 1 indicates that the segmentation map are updated during the decoding of this frame
+     unsigned char segmentation_update_data ;         // 1 indicates that new parameters are about to be specified for each segment
+     unsigned char segmentation_temporal_update ;     // 1 indicates that the updates to the segmentation map are coded relative to the existing segmentation map
+     short         segmentation_feature_data[8][8];      // specifies the feature data for a segment feature
+     unsigned char segmentation_feature_mask[8];         // indicates that the corresponding feature is unused or feature value is coded
+
+     // loopfilter - refer to section 6.8.10 of the AV1 specification Version 1.0.0 with Errata 1
+     unsigned char  loop_filter_level[2];                // contains loop filter strength values
+     unsigned char  loop_filter_level_u;                 // loop filter strength value of U plane
+     unsigned char  loop_filter_level_v;                 // loop filter strength value of V plane
+     unsigned char  loop_filter_sharpness;               // indicates the sharpness level
+     char           loop_filter_ref_deltas[8];           // contains the adjustment needed for the filter level based on the chosen reference frame
+     char           loop_filter_mode_deltas[2];          // contains the adjustment needed for the filter level based on the chosen mode
+     unsigned char  loop_filter_delta_enabled ;       // indicates that the filter level depends on the mode and reference frame used to predict a block
+     unsigned char  loop_filter_delta_update ;        // indicates that additional syntax elements are present that specify which mode and
+                                                         // reference frame deltas are to be updated
+     unsigned char  delta_lf_present ;                // specifies whether loop filter delta values are present in the block level
+     unsigned char  delta_lf_res;                    // specifies the left shift to apply to the decoded loop filter values
+     unsigned char  delta_lf_multi  ;                 // separate loop filter deltas for Hy,Vy,U,V edges
+     unsigned char  reserved4_2bits;                 // reserved bits; must be set to 0
+
+     // restoration - refer to section 6.10.15 of the AV1 specification Version 1.0.0 with Errata 1
+     unsigned char lr_unit_size[3];                     // specifies the size of loop restoration units: 0: 32, 1: 64, 2: 128, 3: 256
+     unsigned char lr_type[3] ;                         // used to compute FrameRestorationType
+
+     // reference frames
+     unsigned int primary_ref_frame;                    // specifies which reference frame contains the CDF values and other state that should be
+                                                         // loaded at the start of the frame
+     unsigned int ref_frame_map[8];                     // frames in dpb that can be used as reference for current or future frames
+
+     unsigned char temporal_layer_id;                // temporal layer id
+     unsigned char spatial_layer_id;                 // spatial layer id
+
+     // ref frame list
+     struct
+     {
+         unsigned int   width;
+         unsigned int   height;
+         unsigned int  index;
+     } ref_frame[7];                                     // frames used as reference frame for current frame.
+
+     // global motion
+     struct {
+         unsigned char invalid ;
+         unsigned char wmtype;                       // defined as GmType in AV1 specification
+         int           wmmat[6];                         // defined as gm_params[] in AV1 specification
+     } global_motion[7];                                 // global motion params for reference frames
+
+     // film grain params - refer to section 6.8.20 of the AV1 specification Version 1.0.0 with Errata 1
+     unsigned short apply_grain ;
+     unsigned short overlap_flag ;
+     unsigned short scaling_shift_minus8;
+     unsigned short chroma_scaling_from_luma ;
+     unsigned short ar_coeff_lag;
+     unsigned short ar_coeff_shift_minus6;
+     unsigned short grain_scale_shift;
+     unsigned short clip_to_restricted_range ;
+     unsigned char  num_y_points;
+     unsigned char  scaling_points_y[14][2];
+     unsigned char  num_cb_points;
+     unsigned char  scaling_points_cb[10][2];
+     unsigned char  num_cr_points;
+     unsigned char  scaling_points_cr[10][2];
+     unsigned short random_seed;
+     short          ar_coeffs_y[24];
+     short          ar_coeffs_cb[25];
+     short          ar_coeffs_cr[25];
+     unsigned char  cb_mult;
+     unsigned char  cb_luma_mult;
+     short          cb_offset;
+     unsigned char  cr_mult;
+     unsigned char  cr_luma_mult;
+     short          cr_offset;
+
+} VdpPictureInfoAV1;
+
 
 /**
  * \brief Picture parameter information for HEVC FormatRangeExtensions picture.
